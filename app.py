@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
-    api_url = 'https://redcap2.mdanderson.org/api/'
+    api_url = 'https://redcap34.mdanderson.org/api/'
     api_key = 'BC107D101DB6A3444C1303A4C8D57FAC'
     project = Project(api_url, api_key)
     data = project.export_records(records=[1],fields=['bmi'])
