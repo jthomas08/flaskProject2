@@ -22,20 +22,24 @@ def hello_world():
 @app.route("/register", methods=["POST"])
 def register():
     # this line goes to the console/terminal in flask dev server
+    # read the parameters from external file
+    with open('C:/REDCap/PROTECT/POC/hh_params.txt') as f:
+        d = dict(l.strip().split('=') for l in f)
+        project = Project(d.get('api_url'), d.get('hh_api_key'))
+        report_id=d.get('report_id')
     print(request.form.to_dict())
     if(request.form.to_dict()['instrument']=="participant_contact_and_scheduling_form_appendix_b"):
         post_rn=request.form.to_dict()['record']
-        api_url = 'http://localhost/redcapstd/api/'
-        api_key = '5FC5EA62E4CCA75AC76A1EAFB4CAA5C9'
-        project = Project(api_url, api_key)
-        data = project.export_records(records=[post_rn], fields=['y_b1_first_record','y_hh_id_exists'])
+
+        data = project.export_records(records=[post_rn], fields=['y_b1_first_record','y_hh_id_exists','y_b1_use_same_info'])
         print(type(data))
         print(type(data))
         first_hh=data[0]['y_b1_first_record']
+        use_hh_info=data[0]['y_b1_use_same_info']
         target_hh = data[0]['y_hh_id_exists']
-        if (first_hh=='1'):
+        if (first_hh=='1' or use_hh_info=='0'):
             return ('', 204)
-        r_hh=project.export_reports(format='df',report_id=39)
+        r_hh=project.export_reports(format='df',report_id=report_id)
         r_hh_row=r_hh.loc[r_hh['y_hh_id'] == target_hh]
 
         r_hh_row.insert(0,'record_id',post_rn)
