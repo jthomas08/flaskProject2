@@ -5,18 +5,18 @@ from flask import jsonify
 import requests
 import pandas as pd
 import sys
-
+from logging.config import fileConfig
 
 app = Flask(__name__)
-
+fileConfig('logging.cfg')
 
 @app.route('/')
 def hello_world():
-    api_url = 'https://redcap34.mdanderson.org/api/'
+    api_url = 'https://redcap.mdanderson.org/api/'
     api_key = 'BC107D101DB6A3444C1303A4C8D57FAC'
     project = Project(api_url, api_key)
     data = project.export_records(records=[1],fields=['bmi'])
-    #print(data)
+    app.logger.debug("Process default result")
     return jsonify(data)
 
 @app.route("/register", methods=["POST"])
@@ -51,7 +51,7 @@ def register():
         r_hh_row[m.columns] = m.round().astype('Int64')
 
         print(r_hh_row.dtypes)
-        r_imp_file=r_hh_row.to_csv('C:/REDCap/PROTECT/POC/fam.csv', index = False)
+        #r_imp_file=r_hh_row.to_csv('C:/REDCap/PROTECT/POC/fam.csv', index = False)
         r_imp=r_hh_row.to_csv(index=False)
 
         response = project.import_records(r_imp, format='csv', date_format='MDY')
